@@ -1,0 +1,16 @@
+{
+  "gradient": {
+    "from": "#ffffff",
+    "via": "#1e40af",
+    "to": "#0b1229",
+    "stop4": "#ffffff",
+    "direction": "to right"
+  },
+  "colors": {
+    "navText": "#0b1229",
+    "navTextHover": "#0a1a4a",
+    "headerTitle": "#ffffff",
+    "headerSubtitle": "#ffffff",
+    "tableHeaderText": "#6b7280"
+  }
+}

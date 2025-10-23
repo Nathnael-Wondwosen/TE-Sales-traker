@@ -1,0 +1,3 @@
+agent Name(defualt sales person name who logged in to the system), contact phone, call title, customer name, date(defult current date), duration (the moment the user called the customer if will click it and start talking and when finished clicks finished and it will automatically save),call status (scheduled, needs followup, complete or cancled), followup-required, notes, contact email, supervisor comment.
+
+make sure that the table consists all this functionality in a compact for to be used in the apporate manner to insert the data by the agents, so the data values for each customer column could be edited from the table.
