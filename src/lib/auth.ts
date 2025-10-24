@@ -3,9 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcryptjs';
 import clientPromise from '@/lib/mongodb';
 
-if (process.env.NODE_ENV === 'development') {
-  console.log('[Auth] NextAuth configuration loaded');
-}
+console.log('[Auth] NextAuth configuration loading');
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -36,32 +34,37 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('[Auth] Authorize called');
-        }
+        console.log('[Auth] Authorize called with credentials:', credentials?.email);
+        
         if (!credentials?.email || !credentials?.password) {
-          if (process.env.NODE_ENV === 'development') console.log('[Auth] Missing email or password');
+          console.log('[Auth] Missing email or password');
           return null;
         }
         
         try {
+          console.log('[Auth] Connecting to MongoDB');
           const client = await clientPromise;
           const db = client.db(process.env.MONGODB_DB);
-          if (process.env.NODE_ENV === 'development') console.log('[Auth] Searching for user');
+          console.log('[Auth] Searching for user with email:', credentials.email);
+          
           const user = await db.collection('users').findOne({ email: credentials.email });
-          if (process.env.NODE_ENV === 'development') console.log('[Auth] User fetched');
+          console.log('[Auth] User fetch result:', user ? 'Found' : 'Not found');
+          
           if (!user) {
-            if (process.env.NODE_ENV === 'development') console.log('[Auth] User not found');
+            console.log('[Auth] User not found');
             return null;
           }
-          if (process.env.NODE_ENV === 'development') console.log('[Auth] Comparing password');
+          
+          console.log('[Auth] Comparing password');
           const ok = await compare(credentials.password, user.passwordHash || '');
-          if (process.env.NODE_ENV === 'development') console.log('[Auth] Password comparison result:', ok);
+          console.log('[Auth] Password comparison result:', ok);
+          
           if (!ok) {
-            if (process.env.NODE_ENV === 'development') console.log('[Auth] Password invalid');
+            console.log('[Auth] Password invalid');
             return null;
           }
-          if (process.env.NODE_ENV === 'development') console.log('[Auth] Authentication successful');
+          
+          console.log('[Auth] Authentication successful for user:', user.email);
           return {
             id: String(user._id),
             name: user.name || user.email,
@@ -77,28 +80,32 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (process.env.NODE_ENV === 'development') console.log('[Auth] JWT callback');
+      console.log('[Auth] JWT callback called', { token: !!token, user: !!user });
+      
       if (user) {
+        console.log('[Auth] Setting user data in token');
         token.role = (user as any).role || 'agent';
         token.uid = (user as any).id;
       }
+      
+      console.log('[Auth] JWT callback completed');
       return token;
     },
     async session({ session, token }) {
-      if (process.env.NODE_ENV === 'development') console.log('[Auth] Session callback');
+      console.log('[Auth] Session callback called');
+      
       if (session.user) {
+        console.log('[Auth] Setting user data in session');
         (session.user as any).role = token.role || 'agent';
         (session.user as any).id = token.uid as string;
       }
       
-      // Add debugging for production
-      if (process.env.NODE_ENV === 'production') {
-        console.log('[Auth] Session created for user:', session.user?.email);
-      }
-      
+      console.log('[Auth] Session callback completed');
       return session;
     },
   },
 };
 
 export const { auth } = NextAuth(authOptions);
+
+console.log('[Auth] NextAuth configuration loaded');

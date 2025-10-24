@@ -8,6 +8,8 @@ const protectedPrefixes = ['/agent', '/supervisor', '/admin'];
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   
+  console.log('Middleware called for path:', pathname);
+  
   // Skip middleware for API routes, static files, and login page
   if (
     pathname.includes('/api/') || 
@@ -15,17 +17,25 @@ export async function middleware(req: NextRequest) {
     pathname.includes('/favicon.ico') ||
     pathname.includes('/logo.jpg') ||
     pathname === '/login' ||
-    pathname === '/'
+    pathname === '/debug'
   ) {
+    console.log('Skipping middleware for path:', pathname);
     return NextResponse.next();
   }
 
   const requiresAuth = protectedPrefixes.some((p) => pathname.startsWith(p));
+  console.log('Requires auth:', requiresAuth);
 
-  if (!requiresAuth) return NextResponse.next();
+  if (!requiresAuth) {
+    console.log('No auth required, continuing');
+    return NextResponse.next();
+  }
 
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  console.log('Token present:', !!token);
+  
   if (!token) {
+    console.log('No token, redirecting to login');
     const url = new URL('/login', req.url);
     url.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(url);
@@ -33,13 +43,18 @@ export async function middleware(req: NextRequest) {
 
   // Basic RBAC route gating
   const role = (token as any).role as string | undefined;
+  console.log('User role:', role);
+  
   if (pathname.startsWith('/admin') && role !== 'admin') {
+    console.log('Admin route accessed by non-admin, redirecting to home');
     return NextResponse.redirect(new URL('/', req.url));
   }
   if (pathname.startsWith('/supervisor') && role !== 'supervisor' && role !== 'admin') {
+    console.log('Supervisor route accessed by non-supervisor, redirecting to home');
     return NextResponse.redirect(new URL('/', req.url));
   }
 
+  console.log('Access granted');
   return NextResponse.next();
 }
 

@@ -14,8 +14,12 @@ function LoginContent() {
   const { data: session, status } = useSession();
   const callbackUrl = params.get('callbackUrl') || '/';
 
+  console.log('Login page status:', status);
+  console.log('Login page session:', session);
+
   // If user is already logged in, redirect them
   if (status === 'authenticated') {
+    console.log('User already authenticated, redirecting to:', callbackUrl);
     router.push(callbackUrl);
     return (
       <div className="min-h-screen flex items-center justify-center gradient-bg">
@@ -43,6 +47,7 @@ function LoginContent() {
       console.log('Sign in result:', result);
       
       if (result?.error) {
+        console.error('Sign in error:', result.error);
         setError('Invalid email or password');
         setLoading(false);
       } else {
@@ -195,6 +200,9 @@ function LoginContent() {
         
         <div className="mt-6 text-center text-sm text-gray-500 animate-fade-in delay-200">
           <p>© 2023 Sales Tracker. All rights reserved.</p>
+          <p className="mt-2 text-xs text-gray-400">
+            Status: {status} | Session: {session ? 'Available' : 'None'}
+          </p>
         </div>
       </div>
     </div>
