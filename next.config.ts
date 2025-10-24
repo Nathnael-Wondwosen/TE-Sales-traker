@@ -18,6 +18,15 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  // Add rewrites for API routes if needed
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: '/api/:path*'
+      }
+    ];
+  }
 };
 
 export default nextConfig;
