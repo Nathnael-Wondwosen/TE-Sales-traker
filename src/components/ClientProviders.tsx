@@ -15,7 +15,11 @@ export default function ClientProviders({
   const isLoginPage = pathname === '/login';
 
   return (
-    <SessionProvider>
+    <SessionProvider 
+      basePath="/api/auth"
+      refetchInterval={5 * 60} // Refetch session every 5 minutes
+      refetchOnWindowFocus={true}
+    >
       <ThemeProvider>
         {!isLoginPage && <Navigation />}
         <main className="w-full">{children}</main>

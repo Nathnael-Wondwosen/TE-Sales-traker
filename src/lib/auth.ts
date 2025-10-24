@@ -90,6 +90,12 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).role = token.role || 'agent';
         (session.user as any).id = token.uid as string;
       }
+      
+      // Add debugging for production
+      if (process.env.NODE_ENV === 'production') {
+        console.log('[Auth] Session created for user:', session.user?.email);
+      }
+      
       return session;
     },
   },

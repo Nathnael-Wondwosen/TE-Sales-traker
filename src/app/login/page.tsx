@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent, Suspense } from 'react';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 function LoginContent() {
@@ -11,7 +11,21 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
   const params = useSearchParams();
   const router = useRouter();
+  const { data: session, status } = useSession();
   const callbackUrl = params.get('callbackUrl') || '/';
+
+  // If user is already logged in, redirect them
+  if (status === 'authenticated') {
+    router.push(callbackUrl);
+    return (
+      <div className="min-h-screen flex items-center justify-center gradient-bg">
+        <div className="text-center max-w-md px-4">
+          <div className="text-4xl font-bold mb-4 text-primary tracking-tight">TE-Sales Tracker</div>
+          <p className="text-gray-600 mb-8">Redirecting to your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -19,17 +33,21 @@ function LoginContent() {
     setLoading(true);
     
     try {
+      console.log('Attempting to sign in with:', { email });
       const result = await signIn('credentials', {
         redirect: false, // Handle redirect manually
         email,
         password,
       });
       
+      console.log('Sign in result:', result);
+      
       if (result?.error) {
         setError('Invalid email or password');
         setLoading(false);
       } else {
         // Successful login - redirect to callback URL or home
+        console.log('Login successful, redirecting to:', callbackUrl);
         router.push(callbackUrl);
       }
     } catch (err) {

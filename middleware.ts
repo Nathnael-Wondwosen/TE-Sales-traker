@@ -14,7 +14,8 @@ export async function middleware(req: NextRequest) {
     pathname.includes('/_next/') || 
     pathname.includes('/favicon.ico') ||
     pathname.includes('/logo.jpg') ||
-    pathname === '/login'
+    pathname === '/login' ||
+    pathname === '/'
   ) {
     return NextResponse.next();
   }
