@@ -23,30 +23,18 @@ export default function Home() {
         } : null,
         timestamp: new Date().toISOString(),
       });
-      
-      console.log('Home page debug info:', {
-        status,
-        session: session ? {
-          email: session.user?.email,
-          role: (session.user as any)?.role,
-        } : null,
-      });
     }
   }, [session, status]);
 
   useEffect(() => {
     // Only run redirect logic when not loading
     if (status !== 'loading') {
-      console.log('Processing redirect logic', { status, session });
-      
       if (!session) {
-        console.log('No session, redirecting to login');
         router.push('/login');
       } else {
         try {
           // Redirect to appropriate dashboard based on role
           const userRole = (session.user as any).role;
-          console.log('User role:', userRole);
           
           if (!userRole) {
             setError('User role not found. Please contact support.');
@@ -54,7 +42,6 @@ export default function Home() {
           }
           
           const dashboardPath = getDashboardPath(userRole as any);
-          console.log('Redirecting to dashboard:', dashboardPath);
           router.push(dashboardPath);
         } catch (err) {
           console.error('Redirect error:', err);
@@ -80,6 +67,11 @@ export default function Home() {
           </div>
           <div className="mt-6 text-xs text-gray-500">
             <p>Debug: Loading session...</p>
+          </div>
+          <div className="mt-4">
+            <a href="/test" className="text-blue-500 hover:underline text-sm">
+              Test deployment status
+            </a>
           </div>
         </div>
       </div>

@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
   },
   // Ensure proper asset handling
   assetPrefix: '',
+  // Base path (empty for root deployment)
+  basePath: '',
   // Turbopack configuration
   turbopack: {
     root: process.cwd(),
@@ -24,6 +26,10 @@ const nextConfig: NextConfig = {
       {
         source: '/api/:path*',
         destination: '/api/:path*'
+      },
+      {
+        source: '/auth/:path*',
+        destination: '/api/auth/:path*'
       }
     ];
   }

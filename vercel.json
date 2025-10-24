@@ -3,7 +3,14 @@
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/next"
+      "use": "@vercel/next",
+      "config": {
+        "includeFiles": [
+          "next.config.js",
+          "next.config.ts",
+          "tsconfig.json"
+        ]
+      }
     }
   ],
   "routes": [
@@ -12,11 +19,12 @@
       "headers": {
         "cache-control": "public,max-age=31536000,immutable"
       },
-      "dest": "/_next/static/$1"
+      "continue": true
     },
     {
       "src": "/(.*)",
-      "dest": "/"
+      "dest": "/",
+      "methods": ["GET", "HEAD", "OPTIONS"]
     }
   ]
 }
