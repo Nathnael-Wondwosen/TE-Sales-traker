@@ -7,6 +7,18 @@ const protectedPrefixes = ['/agent', '/supervisor', '/admin'];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  
+  // Skip middleware for API routes, static files, and login page
+  if (
+    pathname.includes('/api/') || 
+    pathname.includes('/_next/') || 
+    pathname.includes('/favicon.ico') ||
+    pathname.includes('/logo.jpg') ||
+    pathname === '/login'
+  ) {
+    return NextResponse.next();
+  }
+
   const requiresAuth = protectedPrefixes.some((p) => pathname.startsWith(p));
 
   if (!requiresAuth) return NextResponse.next();
@@ -31,5 +43,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/agent/:path*', '/supervisor/:path*', '/admin/:path*'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|logo.jpg).*)'],
 };

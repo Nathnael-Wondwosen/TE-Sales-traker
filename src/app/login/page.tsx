@@ -2,7 +2,7 @@
 
 import { useState, FormEvent, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 function LoginContent() {
   const [email, setEmail] = useState("");
@@ -10,31 +10,31 @@ function LoginContent() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const params = useSearchParams();
+  const router = useRouter();
   const callbackUrl = params.get('callbackUrl') || '/';
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    console.log('Attempting to sign in with:', { email, password });
     
     try {
       const result = await signIn('credentials', {
-        redirect: true,
+        redirect: false, // Handle redirect manually
         email,
         password,
-        callbackUrl,
       });
-      
-      console.log('Sign in result:', result);
       
       if (result?.error) {
         setError('Invalid email or password');
         setLoading(false);
+      } else {
+        // Successful login - redirect to callback URL or home
+        router.push(callbackUrl);
       }
     } catch (err) {
       console.error('Sign in error:', err);
-      setError('An error occurred during sign in');
+      setError('An error occurred during sign in. Please try again.');
       setLoading(false);
     }
   }

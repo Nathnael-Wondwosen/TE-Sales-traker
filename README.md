@@ -42,14 +42,6 @@ Visit [http://localhost:3000/api/init](http://localhost:3000/api/init) to initia
 
 Visit [http://localhost:3000/api/health](http://localhost:3000/api/health) to check the application health.
 
-## Learn More
-
-To learn more about the technologies used in this project:
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [MongoDB Documentation](https://docs.mongodb.com/)
-- [NextAuth.js Documentation](https://next-auth.js.org/)
-
 ## Deploying to Vercel
 
 Follow these steps to deploy reliably on Vercel:
@@ -92,3 +84,25 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 Notes:
 - Lint warnings will not fail builds (`eslint.ignoreDuringBuilds` enabled), but TypeScript type checks still run.
 - The app avoids logging secrets in production.
+- Make sure your MongoDB connection string is properly formatted and accessible from Vercel.
+
+## Troubleshooting Vercel Deployment
+
+If you encounter issues during deployment:
+
+1. **Navbar appearing on login page**: This has been fixed by conditionally rendering the Navigation component based on the current route.
+
+2. **Authentication errors**: 
+   - Ensure `NEXTAUTH_SECRET` is set correctly in Vercel environment variables
+   - Verify `NEXTAUTH_URL` matches your deployment URL exactly
+   - Check that MongoDB connection string is accessible from Vercel
+
+3. **MongoDB connection issues**:
+   - Verify your MongoDB Atlas cluster has IP whitelist configured for Vercel (0.0.0.0/0)
+   - Check that your database user has proper read/write permissions
+
+4. **Build errors**:
+   - Check the Vercel build logs for specific error messages
+   - Ensure all environment variables are properly set
+
+```

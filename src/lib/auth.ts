@@ -20,7 +20,7 @@ export const authOptions: NextAuthOptions = {
         httpOnly: true,
         sameSite: 'lax',
         path: '/',
-        secure: false, // Set to true in production
+        secure: process.env.NODE_ENV === 'production', // Only secure in production
         maxAge: 30 * 24 * 60 * 60,
       }
     }
@@ -43,29 +43,35 @@ export const authOptions: NextAuthOptions = {
           if (process.env.NODE_ENV === 'development') console.log('[Auth] Missing email or password');
           return null;
         }
-        const client = await clientPromise;
-        const db = client.db(process.env.MONGODB_DB);
-        if (process.env.NODE_ENV === 'development') console.log('[Auth] Searching for user');
-        const user = await db.collection('users').findOne({ email: credentials.email });
-        if (process.env.NODE_ENV === 'development') console.log('[Auth] User fetched');
-        if (!user) {
-          if (process.env.NODE_ENV === 'development') console.log('[Auth] User not found');
+        
+        try {
+          const client = await clientPromise;
+          const db = client.db(process.env.MONGODB_DB);
+          if (process.env.NODE_ENV === 'development') console.log('[Auth] Searching for user');
+          const user = await db.collection('users').findOne({ email: credentials.email });
+          if (process.env.NODE_ENV === 'development') console.log('[Auth] User fetched');
+          if (!user) {
+            if (process.env.NODE_ENV === 'development') console.log('[Auth] User not found');
+            return null;
+          }
+          if (process.env.NODE_ENV === 'development') console.log('[Auth] Comparing password');
+          const ok = await compare(credentials.password, user.passwordHash || '');
+          if (process.env.NODE_ENV === 'development') console.log('[Auth] Password comparison result:', ok);
+          if (!ok) {
+            if (process.env.NODE_ENV === 'development') console.log('[Auth] Password invalid');
+            return null;
+          }
+          if (process.env.NODE_ENV === 'development') console.log('[Auth] Authentication successful');
+          return {
+            id: String(user._id),
+            name: user.name || user.email,
+            email: user.email,
+            role: user.role || 'agent',
+          } as any;
+        } catch (error) {
+          console.error('[Auth] Authorization error:', error);
           return null;
         }
-        if (process.env.NODE_ENV === 'development') console.log('[Auth] Comparing password');
-        const ok = await compare(credentials.password, user.passwordHash || '');
-        if (process.env.NODE_ENV === 'development') console.log('[Auth] Password comparison result:', ok);
-        if (!ok) {
-          if (process.env.NODE_ENV === 'development') console.log('[Auth] Password invalid');
-          return null;
-        }
-        if (process.env.NODE_ENV === 'development') console.log('[Auth] Authentication successful');
-        return {
-          id: String(user._id),
-          name: user.name || user.email,
-          email: user.email,
-          role: user.role || 'agent',
-        } as any;
       },
     }),
   ],

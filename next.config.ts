@@ -6,6 +6,15 @@ const nextConfig: NextConfig = {
     // Allow production builds to successfully complete even if there are ESLint errors.
     ignoreDuringBuilds: true,
   },
+  // Ensure trailing slash behavior is consistent
+  trailingSlash: false,
+  // Configure image optimization for Vercel
+  images: {
+    unoptimized: true, // Use Vercel's image optimization
+  },
+  // Ensure proper asset handling
+  assetPrefix: '',
+  // Turbopack configuration
   turbopack: {
     root: process.cwd(),
   },

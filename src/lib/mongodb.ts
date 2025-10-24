@@ -10,21 +10,33 @@ declare global {
 
 const uri = process.env.MONGODB_URI;
 if (!uri) {
-  throw new Error('Missing MONGODB_URI. Set it in your .env.local');
+  throw new Error('Missing MONGODB_URI. Set it in your .env.local or Vercel environment variables');
 }
 
-const client = new MongoClient(uri);
+const client = new MongoClient(uri, {
+  // Add connection options for better reliability
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+});
+
 let clientPromise: Promise<MongoClient>;
 // Mask credentials in logs
 const safeUri = uri.replace(/(mongodb(?:\+srv)?:\/\/)([^@]+)@/, '$1***@');
 
 if (process.env.NODE_ENV === 'development') {
   if (!global._mongoClientPromise) {
-    global._mongoClientPromise = client.connect();
+    global._mongoClientPromise = client.connect().catch(err => {
+      console.error('[DB] MongoDB connection failed in development:', err?.message || err);
+      throw err;
+    });
   }
   clientPromise = global._mongoClientPromise;
 } else {
-  clientPromise = client.connect();
+  // In production, always create a new connection
+  clientPromise = client.connect().catch(err => {
+    console.error('[DB] MongoDB connection failed in production:', err?.message || err);
+    throw err;
+  });
 }
 
 // Log connection status once per module load (development only)
