@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: te-sales-tracker
+    env: node
+    buildCommand: npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXTAUTH_URL
+        value: https://te-sales-traker.onrender.com
+      - key: NEXTAUTH_SECRET
+        value: Tradethiopia
+      - key: MONGODB_URI
+        value: mongodb+srv://Tradethiopia:123ethiopia@cluster1.5w86z4i.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1
+      - key: MONGODB_DB
+        value: Sales-Tracker
