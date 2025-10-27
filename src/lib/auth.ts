@@ -104,6 +104,15 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+  // Add debug events
+  events: {
+    async signIn({ user, account, profile, isNewUser }) {
+      console.log('[Auth] User signed in:', { user: user?.email, account, profile, isNewUser });
+    },
+    async signOut({ session, token }) {
+      console.log('[Auth] User signed out');
+    },
+  },
 };
 
 export const { auth } = NextAuth(authOptions);
