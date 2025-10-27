@@ -3,17 +3,18 @@
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/next",
-      "config": {
-        "includeFiles": [
-          "next.config.js",
-          "next.config.ts",
-          "tsconfig.json"
-        ]
-      }
+      "use": "@vercel/next"
     }
   ],
   "routes": [
+    {
+      "src": "/api/health",
+      "dest": "/api/health"
+    },
+    {
+      "src": "/api/test-auth",
+      "dest": "/api/test-auth"
+    },
     {
       "src": "/_next/static/(?:[^/]+/)*[^/]+\\.(?:js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|otf)",
       "headers": {
@@ -23,8 +24,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/",
-      "methods": ["GET", "HEAD", "OPTIONS"]
+      "dest": "/"
     }
   ]
 }
