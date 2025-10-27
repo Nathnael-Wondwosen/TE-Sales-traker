@@ -26,15 +26,17 @@ export default function Home() {
     }
   }, [session, status]);
 
+  // Handle redirect logic in useEffect to avoid React warnings
   useEffect(() => {
-    // Only run redirect logic when not loading
     if (status !== 'loading') {
       if (!session) {
+        console.log('No session, redirecting to login');
         router.push('/login');
       } else {
         try {
           // Redirect to appropriate dashboard based on role
           const userRole = (session.user as any).role;
+          console.log('User role:', userRole);
           
           if (!userRole) {
             setError('User role not found. Please contact support.');
@@ -42,7 +44,10 @@ export default function Home() {
           }
           
           const dashboardPath = getDashboardPath(userRole as any);
-          router.push(dashboardPath);
+          console.log('Redirecting to dashboard path:', dashboardPath);
+          
+          // Use replace instead of push to avoid back button issues
+          router.replace(dashboardPath);
         } catch (err) {
           console.error('Redirect error:', err);
           setError('Failed to redirect to dashboard. Please try again.');
@@ -148,6 +153,16 @@ export default function Home() {
         </div>
         <div className="mt-6 text-xs text-gray-500">
           <p>Debug: Session active, redirecting...</p>
+          <button 
+            onClick={() => {
+              const userRole = (session.user as any).role;
+              const dashboardPath = getDashboardPath(userRole as any);
+              router.push(dashboardPath);
+            }}
+            className="mt-2 text-blue-500 hover:underline"
+          >
+            Click here if not redirected automatically
+          </button>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, Suspense } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
@@ -14,13 +14,28 @@ function LoginContent() {
   const { data: session, status } = useSession();
   const callbackUrl = params.get('callbackUrl') || '/';
 
-  console.log('Login page status:', status);
-  console.log('Login page session:', session);
+  // Handle redirect when user is already authenticated
+  useEffect(() => {
+    if (status === 'authenticated') {
+      console.log('User already authenticated, redirecting to:', callbackUrl);
+      router.push(callbackUrl);
+    }
+  }, [status, router, callbackUrl]);
 
-  // If user is already logged in, redirect them
+  // Show loading state while checking authentication
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center gradient-bg">
+        <div className="text-center max-w-md px-4">
+          <div className="text-4xl font-bold mb-4 text-primary tracking-tight">TE-Sales Tracker</div>
+          <p className="text-gray-600 mb-8">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is authenticated, we're in the process of redirecting
   if (status === 'authenticated') {
-    console.log('User already authenticated, redirecting to:', callbackUrl);
-    router.push(callbackUrl);
     return (
       <div className="min-h-screen flex items-center justify-center gradient-bg">
         <div className="text-center max-w-md px-4">
@@ -211,8 +226,6 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center p-4"><div className="text-gray-500">Loading...</div></div>}>
-      <LoginContent />
-    </Suspense>
+    <LoginContent />
   );
 }

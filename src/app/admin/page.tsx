@@ -47,6 +47,16 @@ export default function AdminPage() {
   const [followupTrendData, setFollowupTrendData] = useState<{ month: string; pending: number; completed: number }[]>([]);
   const [agentPerformanceData, setAgentPerformanceData] = useState<{ agentId: string; agentName: string; calls: number; avgDurationSec: number }[]>([]);
 
+  // Debug logging
+  useEffect(() => {
+    console.log('[AdminPage] Session status:', status);
+    console.log('[AdminPage] Session data:', session);
+    
+    if (status === 'authenticated' && session) {
+      console.log('[AdminPage] User role:', (session.user as any)?.role);
+    }
+  }, [session, status]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -171,8 +181,11 @@ export default function AdminPage() {
       }
     };
     
-    fetchData();
-  }, []);
+    // Only fetch data if user is authenticated
+    if (status === 'authenticated') {
+      fetchData();
+    }
+  }, [status]);
 
   if (status === 'loading') {
     return <div className="p-6 flex justify-center items-center h-64">
@@ -183,9 +196,29 @@ export default function AdminPage() {
     </div>;
   }
 
-  if (!session) {
+  if (status === 'unauthenticated') {
     return <div className="p-6">
       <div className="alert alert-error">You must be signed in to view this page.</div>
+      <button 
+        onClick={() => window.location.href = '/login'} 
+        className="btn btn-primary mt-4"
+      >
+        Go to Login
+      </button>
+    </div>;
+  }
+
+  // Check if user has admin role
+  const userRole = (session?.user as any)?.role;
+  if (userRole !== 'admin') {
+    return <div className="p-6">
+      <div className="alert alert-error">You don't have permission to access this page.</div>
+      <button 
+        onClick={() => window.location.href = '/'} 
+        className="btn btn-primary mt-4"
+      >
+        Go to Home
+      </button>
     </div>;
   }
 
