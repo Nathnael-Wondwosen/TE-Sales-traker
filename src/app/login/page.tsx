@@ -212,15 +212,16 @@ function LoginContent() {
             </form>
           </div>
         </div>
-        
-        <div className="mt-6 text-center text-sm text-gray-500 animate-fade-in delay-200">
-          <p>© 2023 Sales Tracker. All rights reserved.</p>
-          <p className="mt-2 text-xs text-gray-400">
-            Status: {status} | Session: {session ? 'Available' : 'None'}
-          </p>
-        </div>
+      </div>
+      <div className="mt-6 text-center text-sm text-gray-500 animate-fade-in delay-200">
+        <p> 2023 Sales Tracker. All rights reserved.</p>
+        <p className="mt-2 text-xs text-gray-400">
+          Status: {status} | Session: {session ? 'Available' : 'None'}
+        </p>
       </div>
     </div>
+  );
+}
 
 export default function LoginPage() {
   return (
