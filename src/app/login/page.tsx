@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, useEffect } from 'react';
+import { useState, FormEvent, useEffect, Suspense } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
@@ -221,11 +221,11 @@ function LoginContent() {
         </div>
       </div>
     </div>
-  );
-}
 
 export default function LoginPage() {
   return (
-    <LoginContent />
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center gradient-bg"><div className="text-center max-w-md px-4"><div className="text-4xl font-bold mb-4 text-primary tracking-tight">TE-Sales Tracker</div><p className="text-gray-600 mb-8">Loading...</p></div></div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
